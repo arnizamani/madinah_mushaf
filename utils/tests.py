@@ -1,8 +1,14 @@
-# pylint: disable=missing-module-docstring,missing-function-docstring,wildcard-import,unused-wildcard-import
+"""This module contains validation tests."""
+
+# pylint: disable=missing-function-docstring
 import re
 from configparser import ConfigParser
-from .common import lines, words, unwords, strip_whitespace, is_surah_heading
-from .constants import *
+from .common import lines, unwords, strip_whitespace, is_surah_heading
+from .constants import (
+    SURAH_COUNT, AYAAT_COUNT, BISMILLAH_COUNT,
+    END_OF_AYAH, BRACKET_START, BRACKET_END,
+    BEH, SHADDA, YEH_HAMZA_ABOVE, SUP_ALEF,
+    FATHA, KASRA)
 
 
 def _test_line_count(text: str):
@@ -43,7 +49,7 @@ def test_spacing_did_not_change_contents(old_text: str, new_text: str):
     assert unwords(lines(old_text)) == unwords(lines(new_text))
 
 
-def run_final_tests(old_text: str, new_text: str, config: ConfigParser) -> None:
+def run_final_tests(new_text: str, config: ConfigParser) -> None:
     _test_line_count(new_text)
     _test_surah_count(new_text)
     _test_ayah_count(new_text)

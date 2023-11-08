@@ -6,7 +6,6 @@ https://github.com/arnizamani/madinah_mushaf
 """
 # pylint: disable=missing-function-docstring
 import configparser
-from utils.constants import *
 from utils.funcs import lines, unlines, make_unicode_compliant
 from utils.tests import run_final_tests
 
@@ -45,7 +44,7 @@ def main():
     source = read_source()
 
     result: str = make_unicode_compliant(source, config)
-    run_final_tests(source, result, config)
+    run_final_tests(result, config)
 
     save_result(result)
 

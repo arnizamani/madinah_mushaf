@@ -2,8 +2,7 @@
 import re
 from copy import copy
 from configparser import ConfigParser
-from typing import List
-from .constants import *
+from .constants import *  # pylint: disable=unused-wildcard-import, wildcard-import
 from .common import lines, unlines, strip_whitespace, is_surah_heading, replace_and_assert
 from .tests import test_spacing_did_not_change_contents
 
@@ -105,11 +104,12 @@ def format_spacing(text: str, config: ConfigParser) -> str:
 
 def unicode_compliance(text: str) -> str:
     """Convert non-Unicode characters to their Unicode counterparts"""
-    text = replace_and_assert(text, '\u0657', '\u08F0', chars=2901) # Open fathatan
-    text = replace_and_assert(text, '\u065E', '\u08F1', chars=1807) # Open dammatan
-    text = replace_and_assert(text, '\u0656', '\u08F2', chars=1935) # Open kasratan
-    text = replace_and_assert(text, '\u06E4', '', length=-26)
-    text = replace_and_assert(text, '\u0652', '\u06DF', chars=3988) # Sukun -> Small High Rounded Zero
+    text = replace_and_assert(text, '\u0657', '\u08F0', chars_changed=2901) # Open fathatan
+    text = replace_and_assert(text, '\u065E', '\u08F1', chars_changed=1807) # Open dammatan
+    text = replace_and_assert(text, '\u0656', '\u08F2', chars_changed=1935) # Open kasratan
+    text = replace_and_assert(text, '\u06E4', '', length_increase=-26)
+    # Sukun -> Small High Rounded Zero
+    text = replace_and_assert(text, '\u0652', '\u06DF', chars_changed=3988)
     return text
 
 
@@ -131,26 +131,27 @@ def fix_superscript_alef(text: str) -> str:
 
 def spelling_corrections(text: str, config: ConfigParser) -> str:
     # Insert Small High Waw with Maddah Above in only one word Li-Yasoo'oo
-    text = replace_and_assert(text, 'سُـُٔو', 'سُـࣳٓــُٔو', words=1)
+    text = replace_and_assert(text, 'سُـُٔو', 'سُـࣳٓــُٔو', words_changed=1)
 
     # Convert Yeh to Urdu Yeh (dotless form)
-    text = replace_and_assert(text, '\u064A', '\u06CC', chars=22057)
+    text = replace_and_assert(text, '\u064A', '\u06CC', chars_changed=22057)
 
     # Fix Lam-Alef
-    text = replace_and_assert(text, '\u0623\u0653', '\u0640\u0654\u064E\u0627', words=277)
+    text = replace_and_assert(text, '\u0623\u0653', '\u0640\u0654\u064E\u0627', words_changed=277)
 
     # Fix Faddaraatum
     text = replace_and_assert(
-        text, f'{SUP_ALEF}{HAMZA_ABOVE}', f'\u08AD{HAMZA_ABOVE}{SUKUN}', words=1, length=1)
+        text, f'{SUP_ALEF}{HAMZA_ABOVE}', f'\u08AD{HAMZA_ABOVE}{SUKUN}',
+        words_changed=1, length_increase=1)
 
     # Fix Ta'amanna
     text = replace_and_assert(
         text, f'{FATHA}{FILLED_DOT_ABOVE}', f'{FATHA}{TATWEEL}{FILLED_DOT_ABOVE}',
-        words=1, length=1)
+        words_changed=1, length_increase=1)
 
     # Move Hamza-Kasra to below baseline
     text = replace_and_assert(
-        text, YEH_HAMZA_ABOVE + KASRA, ALEF_MAQSURA + HAMZA_BELOW + KASRA, words=676)
+        text, YEH_HAMZA_ABOVE + KASRA, ALEF_MAQSURA + HAMZA_BELOW + KASRA, words_changed=676)
 
     if config.getboolean('Format', 'horizontal_placement_of_alef_saghira'):
         text = fix_superscript_alef(text)
