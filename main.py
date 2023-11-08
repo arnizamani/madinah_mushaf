@@ -4,19 +4,33 @@ The latest code and the converted Quran text can be downloaded from:
 https://github.com/arnizamani/madinah_mushaf
 
 """
+# pylint: disable=missing-function-docstring
+import configparser
 from utils.constants import *
-from utils.funcs import lines, unlines
+from utils.funcs import lines, unlines, make_unicode_compliant
+from utils.tests import run_final_tests
 
+CONFIG_PATH = 'config.ini'
 SOURCE_PATH = 'madinah_mushaf_hafs_raw.txt'
 TARGET_PATH = 'madinah_mushaf_hafs.txt'
+
+
+def read_config():
+    config = configparser.ConfigParser()
+    config.read(CONFIG_PATH)
+    return config
 
 
 def read_source():
     with open(SOURCE_PATH, mode='r', errors='raise', encoding='utf-8') as obj:
         text = obj.read()
-        return unlines(
+        source = unlines(
             [line for line in lines(text) if not line.startswith('#')]
         )
+        source_line_count = len(lines(source))
+        print('Source lines', source_line_count)
+        assert source_line_count == 9649, "Raw text must contain 9649 lines"
+        return source
 
 
 def save_result(text: str) -> None:
@@ -25,10 +39,13 @@ def save_result(text: str) -> None:
 
 
 def main():
-    source = read_source()
-    print(len(source))
+    config = read_config()
 
-    result: str = source
+    source = read_source()
+
+    result: str = make_unicode_compliant(source, config)
+    run_final_tests(source, result)
+
     save_result(result)
 
 
