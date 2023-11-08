@@ -1,6 +1,7 @@
 # pylint: disable=missing-module-docstring,missing-function-docstring,wildcard-import,unused-wildcard-import
 import re
-from .common import lines, words, unwords, strip_whitespace
+from configparser import ConfigParser
+from .common import lines, words, unwords, strip_whitespace, is_surah_heading
 from .constants import *
 
 
@@ -9,7 +10,7 @@ def _test_line_count(text: str):
 
 
 def _test_surah_count(text):
-    assert len([line for line in lines(text) if line.startswith(BRACKET_START)]) == SURAH_COUNT
+    assert len([line for line in lines(text) if is_surah_heading(line)]) == SURAH_COUNT
 
 
 def _test_ayah_count(text):
@@ -17,8 +18,13 @@ def _test_ayah_count(text):
     assert len([line for line in lines(text) if END_OF_AYAH in line]) == AYAAT_COUNT
 
 
-def _test_bismillah_count(text: str):
-    assert len(re.findall(f'{BEH}({SHADDA})?{KASRA}سۡمِ ٱللَّهِ ٱلرَّحۡمَٰنِ ٱلرَّحِيمِ', text)) == SURAH_COUNT
+def _test_bismillah_count(text: str, config: ConfigParser):
+    bismillah_format = 'سۡمِ ٱللَّهِ ٱلرَّحۡمَٰنِ ٱلرَّحِیمِ'
+    if config.getboolean('Format', 'horizontal_placement_of_alef_saghira'):
+        bismillah_format = 'سۡمِ ٱللَّهِ ٱلرَّحۡمَـٰنِ ٱلرَّحِیمِ'
+
+    assert len(re.findall(f'{BEH}({SHADDA})?{KASRA}' + bismillah_format, text))\
+        == SURAH_COUNT
 
 
 def _strip_non_text_chars(text: str) -> str:
@@ -26,6 +32,7 @@ def _strip_non_text_chars(text: str) -> str:
     text = re.sub(BRACKET_START, '', text)
     text = re.sub(BRACKET_END, '', text)
     text = re.sub('[٠١٢٣٤٥٦٧٨٩]', '', text)
+    text = re.sub('[۰۱۲۳۴۵۶۷۸۹]', '', text)
     text = strip_whitespace(text)
     return text
 
@@ -36,8 +43,10 @@ def test_spacing_did_not_change_contents(old_text: str, new_text: str):
     assert unwords(lines(old_text)) == unwords(lines(new_text))
 
 
-def run_final_tests(old_text: str, new_text: str) -> None:
+def run_final_tests(old_text: str, new_text: str, config: ConfigParser) -> None:
     _test_line_count(new_text)
     _test_surah_count(new_text)
     _test_ayah_count(new_text)
-    _test_bismillah_count(new_text)
+    _test_bismillah_count(new_text, config)
+    assert YEH_HAMZA_ABOVE + KASRA not in new_text
+    assert FATHA + SUP_ALEF not in new_text

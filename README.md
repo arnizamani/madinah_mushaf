@@ -23,9 +23,9 @@ Results are saved in `madinah_mushaf_hafs.txt`.
 ## Result
 The converted Unicode-compliant text is included here in the file `madinah_mushaf_hafs.txt`.
 
-## Fonts 
-Not all Arabic-script fonts have support for the complete characterset of the Quran. Following fonts can be used to properly visualize the converted text:
+## Issues
+Currently, some software do not show certain character combinations correctly. For example, MS Word does not properly join `Waqf` signs with `U+06DF` (silent character).
 
-* Scheherazade New (by SIL)
-* Lateef (by SIL)
-* Paktype Naskh (by Lateef Sagar Shaikh)
+When `Hamza` sits between `Lam` and `Alef`, the `Lam-Alef` ligature is not formed correctly in any software. This is a deficiency in Unicode specification. Work is ongoing to fix this.
+
+Most of the modern Arabic fonts place `Shadda+Kasra` above a letter. In Quranic typography, `Kasra` should actually be placed below the letter. Some fonts have an option to override the default behavior in the rendering sofware (e.g. Scheherazade New).

@@ -36,6 +36,7 @@ def read_source():
 def save_result(text: str) -> None:
     with open(TARGET_PATH, mode='w', errors='raise', encoding='utf-8') as obj:
         obj.write(text)
+    print('Target lines', len(lines(text)))
 
 
 def main():
@@ -44,7 +45,7 @@ def main():
     source = read_source()
 
     result: str = make_unicode_compliant(source, config)
-    run_final_tests(source, result)
+    run_final_tests(source, result, config)
 
     save_result(result)
 
